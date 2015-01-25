@@ -24,7 +24,7 @@ public class iNowBeaconListAdapter extends ArrayAdapter<iNowBeacon> {
     private Handler handler;
     private ScheduledExecutorService service;
 
-    public iNowBeaconListAdapter(Context context, int resource, int textViewResourceId, List<iNowBeacon> beacons) {
+    public iNowBeaconListAdapter(Context context, int resource, List<iNowBeacon> beacons) {
         super(context, resource, beacons);
         //this.beacons = beacons;
         handler = new Handler(context.getMainLooper());
@@ -43,17 +43,17 @@ public class iNowBeaconListAdapter extends ArrayAdapter<iNowBeacon> {
             TextView tempText = (TextView) v
                     .findViewById(R.id.textView2);
             TextView humidText = (TextView) v
-                    .findViewById(R.id.textView4);
+                    .findViewById(R.id.textView5);
             TextView illumText = (TextView) v
-                    .findViewById(R.id.textView6);
+                    .findViewById(R.id.textView8);
             if (beacon.isiNow) {
-                tempText.setText(beacon.temperature);
-                humidText.setText(beacon.humidity);
-                illumText.setText(beacon.illuminance);
+                tempText.setText(Integer.valueOf(beacon.temperature).toString());
+                humidText.setText(Integer.valueOf(beacon.humidity).toString());
+                illumText.setText(Integer.valueOf(beacon.illuminance).toString());
             } else {
-                tempText.setText("ーーー");
-                humidText.setText("ーー");
-                illumText.setText("ーーー");
+                tempText.setText("ー");
+                humidText.setText("ー");
+                illumText.setText("ー");
             }
 
 
@@ -64,8 +64,8 @@ public class iNowBeaconListAdapter extends ArrayAdapter<iNowBeacon> {
             TextView minorText = (TextView) v
                     .findViewById(R.id.textView15);
             uuidText.setText(beacon.proximityUUID.toString());
-            //majorText.setText(beacon.major);
-            //minorText.setText(beacon.minor);
+            majorText.setText(Integer.valueOf(beacon.major).toString());
+            minorText.setText(Integer.valueOf(beacon.minor).toString());
         }
         return v;
     }
