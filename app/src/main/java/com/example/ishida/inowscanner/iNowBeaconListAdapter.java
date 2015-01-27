@@ -9,8 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +25,7 @@ public class iNowBeaconListAdapter extends ArrayAdapter<iNowBeacon> {
     //private List<iNowBeacon> beacons;
     private Handler handler;
     private ScheduledExecutorService service;
+    private UpdateListener listener = null;
 
     public iNowBeaconListAdapter(Context context, int resource, List<iNowBeacon> beacons) {
         super(context, resource, beacons);
@@ -122,6 +125,9 @@ public class iNowBeaconListAdapter extends ArrayAdapter<iNowBeacon> {
                                 remove(b);
                             }
                         });
+                        if (listener != null) {
+                            listener.onRemoved(b);
+                        }
                     }
                 }
             }
@@ -131,6 +137,23 @@ public class iNowBeaconListAdapter extends ArrayAdapter<iNowBeacon> {
     public void stopScheduler() {
         service.shutdown();
 
+    }
+
+    public Map<String, iNowBeacon> getBeacons() {
+        Map<String, iNowBeacon> map = new HashMap<String, iNowBeacon>();
+        for (int i = 0; i < getCount(); i++) {
+            iNowBeacon b = getItem(i);
+            map.put(b.address, b);
+        }
+        return map;
+    }
+
+    public void setListener(UpdateListener listener) {
+        this.listener = listener;
+    }
+
+    public interface UpdateListener {
+        void onRemoved(iNowBeacon beacon);
     }
 
     /*

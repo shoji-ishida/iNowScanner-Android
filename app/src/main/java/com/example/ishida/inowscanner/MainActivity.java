@@ -16,7 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.firebase.client.Firebase;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -27,6 +31,7 @@ public class MainActivity extends ActionBarActivity {
     private ListFragment fragment;
     private iNowBeaconListAdapter listAdapter;
     private Handler handler;
+    private Firebase fireRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, fragment)
                     .commit();
             listAdapter = new iNowBeaconListAdapter(this,
-                    R.layout.list_cell, android.R.id.text1,
+                    R.layout.list_cell,
                     new ArrayList<iNowBeacon>());
             fragment.setListAdapter(listAdapter);
         }
@@ -76,11 +81,30 @@ public class MainActivity extends ActionBarActivity {
                             listAdapter.notifyDataSetChanged();
                         }
                     });
+                    Firebase devicesRef = fireRef.child("devices");
+                    if (newB) {
+                        devicesRef.setValue(listAdapter.getBeacons());
+                    } else {
+                        Firebase childRef = devicesRef.child(b.address);
+                        Map<String, Object> meow = b.map();
+                        childRef.updateChildren(meow);
+                    }
                 } else {
                     Log.d(TAG, "not a beacon");
                 }
             }
         };
+
+        Firebase.setAndroidContext(this);
+        fireRef = new Firebase("https://intense-heat-9521.firebaseio.com/iNow");
+
+        listAdapter.setListener(new iNowBeaconListAdapter.UpdateListener() {
+            @Override
+            public void onRemoved(iNowBeacon beacon) {
+                fireRef.child("devices").child(beacon.address).removeValue();
+            }
+        });
+
     }
 
     @Override

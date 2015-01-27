@@ -3,6 +3,9 @@ package com.example.ishida.inowscanner;
 import android.bluetooth.BluetoothDevice;
 
 import java.nio.ByteBuffer;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.lang.System.*;
@@ -66,6 +69,8 @@ public class iNowBeacon {
     iNowBeacon(String address) {
         this.address = address;
     }
+
+    public iNowBeacon() {};
 
     @Override
     public boolean equals(Object object) {
@@ -143,6 +148,65 @@ public class iNowBeacon {
         byte b = bb.get();
         int val = 0xff & b;
         return val;
+    }
+
+    public UUID getProximityUUID() {
+        return proximityUUID;
+    }
+
+    public int getMajor() {
+        return major;
+    }
+
+    public int getMinor() {
+        return minor;
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getIlluminance() {
+        return illuminance;
+    }
+
+    public int getTemperature() {
+        return temperature;
+    }
+
+    public int getHumidity() {
+        return humidity;
+    }
+
+    public int getBattery() {
+        return battery;
+    }
+
+    public String getLastUpdate() {
+        Date date = new Date(lastUpdate);
+        return date.toString();
+    }
+
+    public Map<String, Object> map() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("proximityUUID", proximityUUID.toString());
+        map.put("major", major);
+        map.put("minor", minor);
+        map.put("power", power);
+        map.put("lastUpdate", getLastUpdate());
+        map.put("isiNow", isiNow);
+        if (isiNow) {
+            map.put("name", name);
+            map.put("illuminance", illuminance);
+            map.put("temperature", temperature);
+            map.put("humidity", humidity);
+            map.put("battery", battery);
+        }
+        return map;
     }
 
     public String toString() {
