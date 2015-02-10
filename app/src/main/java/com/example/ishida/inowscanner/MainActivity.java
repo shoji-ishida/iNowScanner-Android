@@ -119,6 +119,7 @@ public class MainActivity extends ActionBarActivity {
         super.onPause();
         listAdapter.stopScheduler();
         bluetoothAdapter.stopLeScan(leScanCallback);
+        fireRef.removeValue();
     }
     @Override
     protected void onDestroy() {
