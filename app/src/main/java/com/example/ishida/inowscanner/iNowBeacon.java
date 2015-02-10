@@ -2,11 +2,13 @@ package com.example.ishida.inowscanner;
 
 import android.bluetooth.BluetoothDevice;
 
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Vector;
 
 import static java.lang.System.*;
 
@@ -30,9 +32,16 @@ public class iNowBeacon {
     private ByteBuffer bb;
     public boolean isiNow = false;
 
+   Vector<Field> changedField = new Vector<Field>();
+
     static public iNowBeacon create(BluetoothDevice device, byte[] scanRecord) {
         if (isBeacon(scanRecord)) {
-            return new iNowBeacon(device.getAddress(), scanRecord);
+            try {
+                return new iNowBeacon(device.getAddress(), scanRecord);
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                return null;
+            }
         } else {
             return null;
         }
@@ -40,6 +49,7 @@ public class iNowBeacon {
 
     static public iNowBeacon parse(iNowBeacon beacon, byte[] scanRecord) {
         if (isBeacon(scanRecord)) {
+            iNowBeacon copy = new iNowBeacon(beacon);
             beacon.bb = ByteBuffer.wrap(scanRecord);
             beacon.parseBeacon();
             if (isiNowBeacon(scanRecord)) {
@@ -55,7 +65,7 @@ public class iNowBeacon {
 
     }
 
-    private iNowBeacon(String address, byte[] scanRecord) {
+    private iNowBeacon(String address, byte[] scanRecord) throws NoSuchFieldException {
         this.address = new String(address);
         bb = ByteBuffer.wrap(scanRecord);
         parseBeacon();
@@ -64,13 +74,40 @@ public class iNowBeacon {
             parseiNowBeacon();
         }
         lastUpdate = System.currentTimeMillis();
+        changedField.add(getClass().getField("proximityUUID"));
+        changedField.add(getClass().getField("major"));
+        changedField.add(getClass().getField("minor"));
+        changedField.add(getClass().getDeclaredField("lastUpdate"));
+        changedField.add(getClass().getField("power"));
+        changedField.add(getClass().getField("isiNow"));
+        changedField.add(getClass().getField("name"));
+        changedField.add(getClass().getField("illuminance"));
+        changedField.add(getClass().getField("temperature"));
+        changedField.add(getClass().getField("humidity"));
+        changedField.add(getClass().getField("battery"));
     }
 
     iNowBeacon(String address) {
         this.address = address;
     }
 
+    iNowBeacon(iNowBeacon beacon) {
+        this.proximityUUID = UUID.fromString(beacon.toString());
+        this.major = beacon.major;
+        this.minor = beacon.minor;
+        this.power = beacon.power;
+        this.name = new String(beacon.name);
+        this.illuminance = beacon.illuminance;
+        this.temperature = beacon.temperature;
+        this.humidity = beacon.humidity;
+        this.battery = beacon.battery;
+        this.address = new String(beacon.address);
+        this.lastUpdate = beacon.lastUpdate;
+        this.isiNow = beacon.isiNow;
+    }
+
     public iNowBeacon() {};
+
 
     @Override
     public boolean equals(Object object) {
@@ -205,6 +242,18 @@ public class iNowBeacon {
             map.put("temperature", temperature);
             map.put("humidity", humidity);
             map.put("battery", battery);
+        }
+        return map;
+    }
+
+    public Map<String, Object> map2() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        for (Field field : changedField) {
+            try {
+                map.put(field.getName(), field.get(this));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
         return map;
     }

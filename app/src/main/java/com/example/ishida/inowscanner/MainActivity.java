@@ -86,7 +86,7 @@ public class MainActivity extends ActionBarActivity {
                         devicesRef.setValue(listAdapter.getBeacons());
                     } else {
                         Firebase childRef = devicesRef.child(b.address);
-                        Map<String, Object> meow = b.map();
+                        Map<String, Object> meow = b.map2();
                         childRef.updateChildren(meow);
                     }
                 } else {
