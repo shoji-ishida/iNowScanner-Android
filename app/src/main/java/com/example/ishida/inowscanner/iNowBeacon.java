@@ -1,6 +1,7 @@
 package com.example.ishida.inowscanner;
 
 import android.bluetooth.BluetoothDevice;
+import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
@@ -92,7 +93,7 @@ public class iNowBeacon {
     }
 
     iNowBeacon(iNowBeacon beacon) {
-        this.proximityUUID = UUID.fromString(beacon.toString());
+        this.proximityUUID = UUID.fromString(beacon.proximityUUID.toString());
         this.major = beacon.major;
         this.minor = beacon.minor;
         this.power = beacon.power;
