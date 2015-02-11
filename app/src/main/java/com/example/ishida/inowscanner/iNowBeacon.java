@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
-import static java.lang.System.*;
-
 /**
  * Created by ishida on 2015/01/20.
  */
@@ -33,7 +31,7 @@ public class iNowBeacon {
     private ByteBuffer bb;
     public boolean isiNow = false;
 
-   Vector<Field> changedField = new Vector<Field>();
+   Vector<Field> changedFields = new Vector<Field>();
 
     static public iNowBeacon create(BluetoothDevice device, byte[] scanRecord) {
         if (isBeacon(scanRecord)) {
@@ -58,6 +56,45 @@ public class iNowBeacon {
                 beacon.parseiNowBeacon();
             }
             beacon.lastUpdate = System.currentTimeMillis();
+            beacon.changedFields.clear();
+            try {
+                if (!beacon.proximityUUID.equals(copy.proximityUUID)) {
+                    beacon.changedFields.add(beacon.getClass().getField("proximityUUID"));
+                }
+                if (beacon.major != copy.major) {
+                    beacon.changedFields.add(beacon.getClass().getField("major"));
+                }
+                if (beacon.minor != copy.minor) {
+                    beacon.changedFields.add(beacon.getClass().getField("minor"));
+                }
+                if (beacon.power != copy.power) {
+                    beacon.changedFields.add(beacon.getClass().getField("power"));
+                }
+                if (beacon.lastUpdate != copy.lastUpdate) {
+                    beacon.changedFields.add(beacon.getClass().getDeclaredField("lastUpdate"));
+                }
+                if (beacon.isiNow != copy.isiNow) {
+                    beacon.changedFields.add(beacon.getClass().getField("isiNow"));
+                }
+                if (!beacon.name.equals(copy.name)) {
+                    beacon.changedFields.add(beacon.getClass().getField("name"));
+                }
+                if (beacon.illuminance != copy.illuminance) {
+                    beacon.changedFields.add(beacon.getClass().getField("illuminance"));
+                }
+                if (beacon.temperature != copy.temperature) {
+                    beacon.changedFields.add(beacon.getClass().getField("temperature"));
+                }
+                if (beacon.humidity != copy.humidity) {
+                    beacon.changedFields.add(beacon.getClass().getField("humidity"));
+                }
+                if (beacon.battery != copy.battery) {
+                    beacon.changedFields.add(beacon.getClass().getField("battery"));
+                }
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+                return null;
+            }
             return beacon;
         } else {
             return null;
@@ -75,17 +112,17 @@ public class iNowBeacon {
             parseiNowBeacon();
         }
         lastUpdate = System.currentTimeMillis();
-        changedField.add(getClass().getField("proximityUUID"));
-        changedField.add(getClass().getField("major"));
-        changedField.add(getClass().getField("minor"));
-        changedField.add(getClass().getDeclaredField("lastUpdate"));
-        changedField.add(getClass().getField("power"));
-        changedField.add(getClass().getField("isiNow"));
-        changedField.add(getClass().getField("name"));
-        changedField.add(getClass().getField("illuminance"));
-        changedField.add(getClass().getField("temperature"));
-        changedField.add(getClass().getField("humidity"));
-        changedField.add(getClass().getField("battery"));
+        changedFields.add(getClass().getField("proximityUUID"));
+        changedFields.add(getClass().getField("major"));
+        changedFields.add(getClass().getField("minor"));
+        changedFields.add(getClass().getDeclaredField("lastUpdate"));
+        changedFields.add(getClass().getField("power"));
+        changedFields.add(getClass().getField("isiNow"));
+        changedFields.add(getClass().getField("name"));
+        changedFields.add(getClass().getField("illuminance"));
+        changedFields.add(getClass().getField("temperature"));
+        changedFields.add(getClass().getField("humidity"));
+        changedFields.add(getClass().getField("battery"));
     }
 
     iNowBeacon(String address) {
@@ -229,7 +266,8 @@ public class iNowBeacon {
         return date.toString();
     }
 
-    public Map<String, Object> map() {
+    /*
+    public Map<String, Object> map2() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("proximityUUID", proximityUUID.toString());
         map.put("major", major);
@@ -246,16 +284,23 @@ public class iNowBeacon {
         }
         return map;
     }
+    */
 
-    public Map<String, Object> map2() {
+    public Map<String, Object> map() {
         Map<String, Object> map = new HashMap<String, Object>();
-        for (Field field : changedField) {
+        for (Field field : changedFields) {
             try {
-                map.put(field.getName(), field.get(this));
+                // looks ugly but should use getter instead
+                if (field.getName().equals("lastUpdate")) {
+                    map.put(field.getName(), getLastUpdate());
+                } else {
+                    map.put(field.getName(), field.get(this));
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
+        Log.d("iNowBeacon", "changedField=" + map);
         return map;
     }
 

@@ -55,7 +55,7 @@ public class MainActivity extends ActionBarActivity {
         leScanCallback = new BluetoothAdapter.LeScanCallback() {
             @Override
             public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                Log.d(TAG, "Le advertisement received: " + device);
+                //Log.d(TAG, "Le advertisement received: " + device);
                 //Log.d(TAG, "scanRecord: " + byteArrayToHex(scanRecord));
                 iNowBeacon beacon;
                 boolean newBeacon;
@@ -90,7 +90,7 @@ public class MainActivity extends ActionBarActivity {
                         childRef.updateChildren(meow);
                     }
                 } else {
-                    Log.d(TAG, "not a beacon");
+                    //Log.d(TAG, "not a beacon");
                 }
             }
         };
