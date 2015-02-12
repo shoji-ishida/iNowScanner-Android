@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.firebase.client.Firebase;
 
@@ -48,6 +49,8 @@ public class MainActivity extends ActionBarActivity {
             fragment.setListAdapter(listAdapter);
         }
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         handler = new Handler(Looper.getMainLooper());
 
         bluetoothManager = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
@@ -74,21 +77,24 @@ public class MainActivity extends ActionBarActivity {
                     final iNowBeacon b = beacon;
                     final boolean newB = newBeacon;
                     Log.d(TAG, beacon.toString());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (newB) listAdapter.add(b);
-                            listAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    Firebase devicesRef = fireRef.child("devices");
-                    if (newB) {
-                        devicesRef.setValue(listAdapter.getBeacons());
-                    } else {
-                        Firebase childRef = devicesRef.child(b.address);
-                        Map<String, Object> meow = b.map();
-                        childRef.updateChildren(meow);
-                    }
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (newB) {
+                                    Log.d(TAG, "add");
+                                    listAdapter.add(b);
+                                }
+                                listAdapter.notifyDataSetChanged();
+                                Firebase devicesRef = fireRef.child("devices");
+                                if (newB) {
+                                    devicesRef.setValue(listAdapter.getBeacons());
+                                } else {
+                                    Firebase childRef = devicesRef.child(b.address);
+                                    Map<String, Object> meow = b.map();
+                                    childRef.updateChildren(meow);
+                                }
+                            }
+                        });
                 } else {
                     //Log.d(TAG, "not a beacon");
                 }
@@ -119,6 +125,8 @@ public class MainActivity extends ActionBarActivity {
         super.onPause();
         listAdapter.stopScheduler();
         bluetoothAdapter.stopLeScan(leScanCallback);
+        listAdapter.clear();
+        listAdapter.notifyDataSetChanged();
         fireRef.removeValue();
     }
     @Override

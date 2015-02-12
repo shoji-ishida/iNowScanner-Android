@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -140,7 +139,7 @@ public class iNowBeaconListAdapter extends ArrayAdapter<iNowBeacon> {
     }
 
     public Map<String, iNowBeacon> getBeacons() {
-        Map<String, iNowBeacon> map = new HashMap<String, iNowBeacon>();
+        Map<String, iNowBeacon> map = new HashMap<>();
         for (int i = 0; i < getCount(); i++) {
             iNowBeacon b = getItem(i);
             map.put(b.address, b);
@@ -156,19 +155,5 @@ public class iNowBeaconListAdapter extends ArrayAdapter<iNowBeacon> {
         void onRemoved(iNowBeacon beacon);
     }
 
-    /*
-    public boolean set(String address, byte[] scanRecord) {
-        iNowBeacon temp = new iNowBeacon(address);
-        int pos = getPosition(temp);
-        temp = getItem(pos);
-        temp = iNowBeacon.parse(temp, scanRecord);
-
-        if (temp != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    */
 
 }
